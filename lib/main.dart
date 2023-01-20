@@ -37,17 +37,21 @@ class _MyHomePageState extends State<MyHomePage> {
   File? _image;
 
   Future getImage(ImageSource source) async {
-    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (image == null) {
-      return;
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) {
+        return;
+      }
+
+      //final imageTemporary = File(image.path);
+      final imagePermanent = await saveFilePermanently(image.path);
+
+      setState(() {
+        _image = imagePermanent;
+      });
+    } on PlatformException catch (e) {
+      return 'Failed to pick image:$e';
     }
-
-    //final imageTemporary = File(image.path);
-    final imagePermanent = await saveFilePermanently(image.path);
-
-    setState(() {
-      _image = imagePermanent;
-    });
   }
 
   Future<File> saveFilePermanently(String imagePath) async {
