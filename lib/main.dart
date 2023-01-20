@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,13 +40,22 @@ class _MyHomePageState extends State<MyHomePage> {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) {
       return;
-
-      final imageTemporary = File(image.path);
-
-      setState(() {
-        this._image = imageTemporary;
-      });
     }
+
+    //final imageTemporary = File(image.path);
+    final imagePermanent = await saveFilePermanently(image.path);
+
+    setState(() {
+      _image = imagePermanent;
+    });
+  }
+
+  Future<File> saveFilePermanently(String imagePath) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final name = basename(imagePath);
+    final image = File('${directory.path}/$name');
+
+    return File(imagePath).copy(image.path);
   }
 
   @override
