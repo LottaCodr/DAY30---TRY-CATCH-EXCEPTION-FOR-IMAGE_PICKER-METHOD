@@ -33,8 +33,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   File? _image;
 
-  Future getImage() async {
-    final image = await ImagePicker().pickImage(source: ImageSource.camera);
+  Future getImage(ImageSource source) async {
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) {
       return;
 
@@ -57,21 +57,27 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 40),
-            Image.network('http://picsum.photos/250?images'),
-            SizedBox(height: 40),
+            _image != null
+                ? Image.file(
+                    _image!,
+                    width: 250,
+                    height: 250,
+                    fit: BoxFit.cover,
+                  )
+                : Image.network('http://picsum.photos/250?images'),
+            const SizedBox(height: 40),
 
             //First custom button for gallery
             CustomButton(
-              title: 'Upload From Gallery',
-              icon: Icons.image_outlined,
-              onClick: getImage,
-            ),
+                title: 'Upload From Gallery',
+                icon: Icons.image_outlined,
+                onClick: () => getImage(ImageSource.gallery)),
 
             //Upload from camera
             CustomButton(
               title: 'Camera',
               icon: Icons.camera,
-              onClick: () => {},
+              onClick: () => getImage(ImageSource.camera),
             )
           ],
         ),
